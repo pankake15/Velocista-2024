@@ -13,9 +13,6 @@ Nota: Asegurarse que el STM32CubeProgrammer sea le version de Windows
 4) Descargar y ejecutar el siguiente driver: 
 	https://www.st.com/en/development-tools/stsw-link004.html
 
-5) Descargar y ejecutar el siguiente driver: 
-	https://www.st.com/en/development-tools/stsw-link009.html?dl=redirect
-
 SOLUCION AL ERROR:
   14:31:59 : UR connection mode is defined with the HWrst reset mode
 
