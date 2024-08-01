@@ -2,17 +2,17 @@
 
 // Boton para iniciar la calibración
 void InterCalibrar() {
-    Start = 1;
+    Botones = Calibracion;
 }
 
 
 // Boton para iniciar la carrera
 void InterIniciar() {
-    Start = 2;
+    Botones = Pid;
 }
 
 
 // Boton para girar las ruedas
 void InterLimpieza() {
-  Start = 3;
+    Botones = Limpiar_R;
 }

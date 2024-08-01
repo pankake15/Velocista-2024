@@ -1,15 +1,14 @@
 void PID(){
   char estado;
-//        Serial1.print("    PID    ");
-        
   if (Serial1.available() > 1){
   pid:
   estado = Serial1.read();
     if(estado == 10 || estado == 13 || estado == -1){
       goto pid;
     }
-    Start = 4;
+    Botones = Bluetooth;
     Serial1.flush();
+    
     // Esperar un corto tiempo para evitar la lectura repetida de datos
     delay(100);
   }else{
@@ -21,7 +20,7 @@ void PID(){
 
         // CALCULO PID
         int error = position - 3500;
-        integral=integral + lastError;
+        integral = integral + lastError;
         integral = constrain(integral, -1000, 1000); //limitamos la integral para no causar problemas
         float motorSpeed = KP * error + KD * (error - lastError) + Ki * integral;
         lastError = error;

@@ -11,5 +11,5 @@ void Limpieza(){
         
             digitalWrite(LED_IZQ, LOW);
             digitalWrite(LED_DER, LOW);
-        Start = 0;
+        Botones = Nada;
 }

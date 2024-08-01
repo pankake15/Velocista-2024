@@ -45,7 +45,7 @@ char x;
 
   Serial1.flush();
   //i++
-  Start = 2;
+  Botones = Pid;
   
   }
   Serial1.print("KP:");

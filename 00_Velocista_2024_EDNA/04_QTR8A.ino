@@ -13,5 +13,5 @@ void Calibrar(){
         }
         digitalWrite(LED_DER, LOW);
         Serial1.println("Termine");
-        Start = 0;
+        Botones = Nada;
 }

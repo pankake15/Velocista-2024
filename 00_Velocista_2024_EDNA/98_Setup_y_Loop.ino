@@ -20,17 +20,17 @@ void setup() {
 }
 
 void loop() {
-    int strt = Start;
+    Modulos Etapa = Botones;
 
     
 
-    if (strt == 1) {
+    if (Etapa == Calibracion) {
         Calibrar();
-    } else if (strt == 2) {
+    } else if (Etapa == Pid) {
         PID();
-    } else if (strt == 3){
+    } else if (Etapa == Limpiar_R){
       Limpieza();
-    }else if(strt == 4){
+    }else if(Etapa == Bluetooth){
       bluetooth();
     }
 }
