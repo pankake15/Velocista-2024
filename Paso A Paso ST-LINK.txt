@@ -1,0 +1,166 @@
+Guia de instalacion ST-LINK
+
+1) Seguir los pasos de esta guia (sin emular el codigo): 
+	https://www.electronicshub.org/getting-started-with-stm32f103c8t6-blue-pill/
+
+Nota: Asegurarse que el STM32CubeProgrammer sea le version de Windows
+
+2) En el IDE de Arduino entrar a Archivo => Preferencias => Gestor URL de tarjetas => pegar el siguiente link: 	
+	https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json
+
+3) Desde el IDE de Arduino buscar en las librerias stm y descargar la libreria STM32 MCU based boards (by STMmicroelectronics)
+
+4) Descargar y ejecutar el siguiente driver: 
+	https://www.st.com/en/development-tools/stsw-link004.html
+
+5) Descargar y ejecutar el siguiente driver: 
+	https://www.st.com/en/development-tools/stsw-link009.html?dl=redirect
+
+SOLUCION AL ERROR:
+  14:31:59 : UR connection mode is defined with the HWrst reset mode
+
+
+Codigo ups:
+/*INFORMACION:
+Este codigo tiene integrado el ejemplo para el lector de sensores con un primer intento de PID.
+
+Falta:
++ Definir si vamos a usar KI
++ Calibrar todas las constantes del PID 
++ Usar esta ecuación:
+  msmax = 1000*(kp+kd*2)+maxI*ki
+  Para poder hacer este:
+  map(motorSpeed,0,msmax,0,255)
+  Abrir MapeoSpeed.png para mas info
++ Definir si queremos un minimo de 0 speed o si preferimos que vaya para atras
+*/
+
+//INSTALAR ANTES DE SEGUIR!!
+#include <QTRSensors.h>
+#include <MapleFreeRTOS900.h>
+
+//DEFINES
+#define  MR_IN1      28
+#define  MR_IN2      29
+#define  ML_IN1      30
+#define  ML_IN2      31
+
+//DECLARO QTR
+QTRSensors qtr;
+
+//VARIABLES DEL SENSOR
+const uint8_t SensorCount = 6;
+uint16_t sensorValues[SensorCount];
+
+//VARIABLES DEL PID
+int lastError = 0;
+int KP = 1, KD = 1;
+int M1 = 175, M2 = 175;
+
+void left(int value)
+  {
+    if ( value >= 0 ) 
+    {
+      digitalWrite(ML_IN1,LOW);
+      digitalWrite(ML_IN2,HIGH);
+    }
+    else
+    {
+      digitalWrite(ML_IN1,HIGH);
+      digitalWrite(ML_IN2,LOW);
+      value *= -1;
+    }
+    analogWrite(ML_PWM,value);
+  }
+
+ void right(int value)
+  {  
+    if ( value >= 0 )
+    {
+      digitalWrite(MR_IN1,HIGH);
+      digitalWrite(MR_IN2,LOW);
+    }
+    else
+    {
+      digitalWrite(MR_IN1,LOW);
+      digitalWrite(MR_IN2,HIGH);
+      value *= -1;
+    }    
+    analogWrite(MR_PWM,value);
+  }
+
+  
+void setup()
+{
+  //CONFIGURACION INICIAL
+  qtr.setTypeAnalog();
+  qtr.setSensorPins((const uint8_t[]){A0, A1, A2, A3, A4, A5}, SensorCount);
+  qtr.setEmitterPin(2);
+  delay(500);
+
+  //AVISO QUE ESTOY CALIBRANDO
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, HIGH);
+
+  //CALIBRACION (10 SEG APROX)
+  for (uint16_t i = 0; i < 400; i++)
+  {
+    qtr.calibrate();
+  }
+
+  //AVISO QUE TERMINE DE PROGRAMAR 
+  digitalWrite(LED_BUILTIN, LOW); 
+
+  //INICIALIZO EL SERIAL
+  Serial.begin(9600);
+
+  //IMPRIMO VALORES MINIMOS LEIDOS EN LA CALIBRACION
+  for (uint8_t i = 0; i < SensorCount; i++)
+  {
+    Serial.print(qtr.calibrationOn.minimum[i]);
+    Serial.print(' ');
+  }
+  Serial.println();
+
+  //IMPRIMO VALORES MAXIMOS LEIDOS EN LA CALIBRACION
+  for (uint8_t i = 0; i < SensorCount; i++)
+  {
+    Serial.print(qtr.calibrationOn.maximum[i]);
+    Serial.print(' ');
+  }
+  Serial.println();
+  Serial.println();
+  delay(1000);
+}
+
+void loop()
+{
+  //CALCULA POSICION DE LINEA NEGRA SEGUN LECTURA DE SENSORES (0-5000)
+  uint16_t position = qtr.readLineBlack(sensorValues);
+
+  //CALCULO PID
+  int error = position - 2500;    
+  int motorSpeed = KP * error + KD * (error - lastError);
+  lastError = error;
+
+  //VELOCIDAD MOTORES
+  int m1Speed = M1 + motorSpeed;
+  int m2Speed = M2 - motorSpeed;
+  if (m1Speed < 0)
+    m1Speed = 0;
+  if (m2Speed < 0)
+    m2Speed = 0;
+
+  left(m1Speed);
+  right(m2Speed);
+ 
+  //IMPRIME VALORES DE LOS SENSORES (0 - MAXREFLECTANCE || 1000 - MINREFLECTANCE)
+  for (uint8_t i = 0; i < SensorCount; i++)
+  {
+    Serial.print(sensorValues[i]);
+    Serial.print('\t');
+  }
+  Serial.print(position);
+  Serial.println(); 
+  delay(250);
+}
