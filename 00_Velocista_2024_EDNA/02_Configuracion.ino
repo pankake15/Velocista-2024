@@ -9,12 +9,14 @@ const uint8_t SensorCount = 8;
 uint16_t sensorValues[SensorCount];
 
 //VARIABLES DEL PID
-int lastError = 0;
-float KP = 0.18, KD = 0.4, Ki = 0.001;
-int integral = 0;
+float lastError = 0;
+float KP = 0.38, KD = 1.35, KI = 0.002;
+float integral = 0;
 int maxMotorSpeed = 7000; // Valor máximo teórico para motorSpeed basado en tu sistema
-int M1 = 25, M2 = 25;
-int MotorF;
+int M1 = 60, M2 = 60;
+int MotorF; 
+
+// hice float a integral, error, lasterror
 
 //VARIABLE DE LAS INTERRUPCIONES
 volatile int Start = 0;

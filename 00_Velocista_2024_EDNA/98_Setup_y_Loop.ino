@@ -22,15 +22,15 @@ void setup() {
 void loop() {
     Modulos Etapa = Botones;
 
-    
-
     if (Etapa == Calibracion) {
         Calibrar();
     } else if (Etapa == Pid) {
-        PID();
+        if (Serial1.available() > 1) {Botones = Bluetooth;}
+        else { PID(); }
     } else if (Etapa == Limpiar_R){
       Limpieza();
     }else if(Etapa == Bluetooth){
+        Serial1.print("Etapa Bluetooth");
       bluetooth();
     }
 }

@@ -1,17 +1,5 @@
 void PID(){
   char estado;
-  if (Serial1.available() > 1){
-  pid:
-  estado = Serial1.read();
-    if(estado == 10 || estado == 13 || estado == -1){
-      goto pid;
-    }
-    Botones = Bluetooth;
-    Serial1.flush();
-    
-    // Esperar un corto tiempo para evitar la lectura repetida de datos
-    delay(100);
-  }else{
         
   // CALCULA POSICION DE LINEA NEGRA SEGUN LECTURA DE SENSORES (0-7000)
         uint16_t position = qtr.readLineWhite(sensorValues);
@@ -19,10 +7,10 @@ void PID(){
         Serial1.print(position);
 
         // CALCULO PID
-        int error = position - 3500;
-        integral = integral + lastError;
+        float error = position - 3500;
+        integral = integral + error;
         integral = constrain(integral, -1000, 1000); //limitamos la integral para no causar problemas
-        float motorSpeed = KP * error + KD * (error - lastError) + Ki * integral;
+        float motorSpeed = KP * error + KD * (error - lastError) + KI * integral;
         lastError = error;
         //Serial1.print("  Error: ");
         //Serial1.print(error);
@@ -53,5 +41,5 @@ void PID(){
             digitalWrite(LED_IZQ, LOW);
             digitalWrite(LED_DER, HIGH);
         }
-}
+//}
 }
