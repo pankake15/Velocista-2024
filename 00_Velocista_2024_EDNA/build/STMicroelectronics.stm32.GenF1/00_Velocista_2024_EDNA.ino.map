@@ -5883,13 +5883,13 @@ LOAD C:/Users/Zoe/AppData/Local/Arduino15/packages/STMicroelectronics/tools/xpac
                 0x20000000                        _sdata = .
  *(.data)
  *(.data*)
- .data.M2       0x20000000        0x4 C:\Users\Zoe\AppData\Local\Temp\arduino\sketches\774D13C182C49D6ECF88D103770C2982\sketch\00_Velocista_2024_EDNA.ino.cpp.o
-                0x20000000                M2
- .data.M1       0x20000004        0x4 C:\Users\Zoe\AppData\Local\Temp\arduino\sketches\774D13C182C49D6ECF88D103770C2982\sketch\00_Velocista_2024_EDNA.ino.cpp.o
-                0x20000004                M1
  .data.maxMotorSpeed
-                0x20000008        0x4 C:\Users\Zoe\AppData\Local\Temp\arduino\sketches\774D13C182C49D6ECF88D103770C2982\sketch\00_Velocista_2024_EDNA.ino.cpp.o
-                0x20000008                maxMotorSpeed
+                0x20000000        0x4 C:\Users\Zoe\AppData\Local\Temp\arduino\sketches\774D13C182C49D6ECF88D103770C2982\sketch\00_Velocista_2024_EDNA.ino.cpp.o
+                0x20000000                maxMotorSpeed
+ .data.M2       0x20000004        0x4 C:\Users\Zoe\AppData\Local\Temp\arduino\sketches\774D13C182C49D6ECF88D103770C2982\sketch\00_Velocista_2024_EDNA.ino.cpp.o
+                0x20000004                M2
+ .data.M1       0x20000008        0x4 C:\Users\Zoe\AppData\Local\Temp\arduino\sketches\774D13C182C49D6ECF88D103770C2982\sketch\00_Velocista_2024_EDNA.ino.cpp.o
+                0x20000008                M1
  .data.KI       0x2000000c        0x4 C:\Users\Zoe\AppData\Local\Temp\arduino\sketches\774D13C182C49D6ECF88D103770C2982\sketch\00_Velocista_2024_EDNA.ino.cpp.o
                 0x2000000c                KI
  .data.KD       0x20000010        0x4 C:\Users\Zoe\AppData\Local\Temp\arduino\sketches\774D13C182C49D6ECF88D103770C2982\sketch\00_Velocista_2024_EDNA.ino.cpp.o

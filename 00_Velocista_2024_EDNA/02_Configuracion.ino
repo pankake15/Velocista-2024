@@ -10,10 +10,10 @@ uint16_t sensorValues[SensorCount];
 
 //VARIABLES DEL PID
 float lastError = 0;
-float KP = 1, KD = 3.1, KI = 0.03;
+float KP = 1.1, KD = 7, KI = 0.04;
+int M1 = 60, M2 = 60;
 float integral = 0;
 int maxMotorSpeed = 7000; // Valor máximo teórico para motorSpeed basado en tu sistema
-int M1 = 60, M2 = 60;
 int MotorF; 
 
 // hice float a integral, error, lasterror
