@@ -15,3 +15,6 @@ Guia de instalacion ST-LINK
 5) Desde el IDE de Arduino en Herramientas => Placa: => Gestor de tarjetas, buscar y descargar la libreria STM32 MCU based boards (by STMmicroelectronics)
 
 6) Desde el IDE de Arduino en Herramientas => Administrar bibliotecas, buscar y descargar QTRSensors
+
+7) Para la configuracion de la placa entrar a la imagen:
+	"configuracion de placa"
