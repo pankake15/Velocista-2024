@@ -25,12 +25,11 @@ void loop() {
     if (Etapa == Calibracion) {
         Calibrar();
     } else if (Etapa == Pid) {
-        if (Serial1.available() > 1) {Botones = Bluetooth;}
+        if (Serial1.available() > 1 && Serial1.read()!= 13 && Serial1.read()!= 10) {Botones = Bluetooth;}
         else { PID(); }
     } else if (Etapa == Limpiar_R){
       Limpieza();
     }else if(Etapa == Bluetooth){
-        Serial1.print("Etapa Bluetooth");
       bluetooth();
     }
 }

@@ -3,13 +3,13 @@ void PID(){
         
   // CALCULA POSICION DE LINEA NEGRA SEGUN LECTURA DE SENSORES (0-7000)
         uint16_t position = qtr.readLineWhite(sensorValues);
-        Serial1.println("POS: ");
-        Serial1.print(position);
+ //       Serial1.println("POS: ");
+ //       Serial1.print(position);
 
         // CALCULO PID
         float error = position - 3500;
         integral = integral + error;
-        integral = constrain(integral, -1000, 1000); //limitamos la integral para no causar problemas
+        integral = constrain(integral, -1200, 1200); //limitamos la integral para no causar problemas
         float motorSpeed = KP * error + KD * (error - lastError) + KI * integral;
         lastError = error;
         //Serial1.print("  Error: ");
