@@ -1,0 +1,11 @@
+
+Velocidad 60:
+
+float KP = 1.1, KD = 7, KI = 0.04;
+int M1 = 60, M2 = 60;
+
+
+Velocidad  75:
+
+float KP = 1.1, KD = 7, KI = 0.04;
+int M1 = 60, M2 = 60;
