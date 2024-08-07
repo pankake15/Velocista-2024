@@ -5,7 +5,7 @@ float KP = 1.1, KD = 7, KI = 0.04;
 int M1 = 60, M2 = 60;
 
 
-Velocidad  75:
+Velocidad  85:
 
-float KP = 1.1, KD = 7, KI = 0.04;
-int M1 = 60, M2 = 60;
+float KP = 1.55, KD = 8.6, KI = 0.04;
+int M1 = 85, M2 = 85;
