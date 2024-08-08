@@ -36,14 +36,12 @@ void bluetooth() {
                 KI -= 0.001;
                 Serial1.flush();
                 break;
-            case 57:
-                M1 += 5;
-                M2 += 5;
+            case 55:
+                Velocidad += 5;
                 Serial1.flush();
                 break;
-            case 58:
-                M1 -= 5;
-                M2 -= 5;
+            case 56:
+                Velocidad -= 5;
                 Serial1.flush();
                 break;
             case 10:
@@ -51,17 +49,17 @@ void bluetooth() {
             case 13:
                 break;
             default:
-             Serial1.println(" Caracter Desconocido ");
+             Serial1.println("Caracter Desconocido ");
              Botones = Pid;
         }
            Serial1.print("KP:");
            Serial1.print(KP);
-           Serial1.print(" KD:");
+           Serial1.print(" - KD:");
            Serial1.print(KD);
-           Serial1.print(" KI:");
+           Serial1.print(" - KI:");
            Serial1.println(KI, 3);
-           Serial1.print(" M:");
-           Serial1.println(M1);
+           Serial1.print("M:");
+           Serial1.println(Velocidad);
 
     }
 }

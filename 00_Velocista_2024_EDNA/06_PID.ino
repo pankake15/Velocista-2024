@@ -1,37 +1,43 @@
 void PID(){
-  char estado;
+  int sensores_c = 0;
+  int sensoresSuma = 0;
         
   // CALCULA POSICION DE LINEA NEGRA SEGUN LECTURA DE SENSORES (0-7000)
         uint16_t position = qtr.readLineWhite(sensorValues);
- //       Serial1.println("POS: ");
- //       Serial1.print(position);
-
+        qtr.read(Valores_rampa);
+        
         // CALCULO PID
         float error = position - 3500;
         integral = integral + error;
         integral = constrain(integral, -1200, 1200); //limitamos la integral para no causar problemas
         float motorSpeed = KP * error + KD * (error - lastError) + KI * integral;
         lastError = error;
-        //Serial1.print("  Error: ");
-        //Serial1.print(error);
-        
-        //                      ---revisar---
-        //motorSpeed = constrain(motorSpeed, -maxMotorSpeed, maxMotorSpeed);
         
         // Mapeo de motorSpeed a rango de -255 a 255
         MotorF = map(motorSpeed, -maxMotorSpeed, maxMotorSpeed, -255, 255);
         MotorF = constrain(MotorF, -255, 255);
+
+        for (uint8_t i = 0; i < SensorCount; i++){
+            Serial1.print(i);
+            Serial1.print(": ");
+            Serial1.print(Valores_rampa[i]);
+            Serial1.print("    ");
+            sensoresSuma += Valores_rampa[i];
+        }
         
-        int m1Speed = M1 + MotorF;
-        int m2Speed = M2 - MotorF;
+        Serial1.println("");
+
+            if(sensoresSuma/8 >= Valores_rampa[0]-10 && sensoresSuma/8 <= Valores_rampa[0]+10 ){
+              MotorF = 0;
+            digitalWrite(LED_IZQ, HIGH);
+            digitalWrite(LED_DER, HIGH);
+            }
+        
+        int m1Speed = Velocidad + MotorF;
+        int m2Speed = Velocidad - MotorF;
 
         right(m1Speed);
-//        Serial1.print("  Izquierda: ");
-//        Serial1.println(m1Speed);
-
         left(m2Speed);
-//        Serial1.print("  Derecha: ");
-//        Serial1.println(m2Speed);
 
         // VELOCIDAD MOTORES
         if (error > 0) {

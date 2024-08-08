@@ -8,8 +8,7 @@ void Limpieza(){
         delay(500);
         analogWrite(ML_PWM, 0);
         analogWrite(MR_PWM, 0);
-        
-      digitalWrite(LED_IZQ, LOW);
-      digitalWrite(LED_DER, LOW);
-      Botones = Nada;
+        digitalWrite(LED_IZQ, LOW);
+        digitalWrite(LED_DER, LOW);
+        Botones = Nada;
 }

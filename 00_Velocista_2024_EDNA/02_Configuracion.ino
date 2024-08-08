@@ -7,11 +7,12 @@ QTRSensors qtr;
 //VARIABLES DEL SENSOR
 const uint8_t SensorCount = 8;
 uint16_t sensorValues[SensorCount];
+uint16_t Valores_rampa[SensorCount];
 
 //VARIABLES DEL PID
 float lastError = 0;
-float KP = 1.1, KD = 7, KI = 0.04;
-int M1 = 60, M2 = 60;
+float KP = 1.55, KD = 8.6, KI = 0.04;
+int Velocidad = 85;
 float integral = 0;
 int maxMotorSpeed = 7000; // Valor máximo teórico para motorSpeed basado en tu sistema
 int MotorF; 
