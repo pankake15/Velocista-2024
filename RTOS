@@ -1,0 +1,228 @@
+#include <STM32FreeRTOS.h>
+#include <QTRSensors.h>
+
+// DEFINES
+#define LED_IZQ PB10
+#define LED_DER PB11
+#define ML_IN1 PB4
+#define ML_IN2 PB5
+#define ML_PWM PA8
+#define MR_IN1 PB3
+#define MR_IN2 PA15
+#define MR_PWM PA0
+#define BOT_I PC13
+#define BOT_C PC14
+#define BOT_D PC15
+
+// DECLARO QTR
+QTRSensors qtr;
+
+// VARIABLES DEL SENSOR
+const uint8_t SensorCount = 8;
+uint16_t sensorValues[SensorCount];
+
+// VARIABLES DEL PID
+float lastError = 0;
+float KP = 1.55, KD = 8.6, KI = 0.04;
+int Velocidad = 65;  // Reducir la velocidad inicial
+float integral = 0;
+int maxMotorSpeed = 255;  // Ajustar el rango de velocidad del motor
+int MotorF;
+
+// Mutex para proteger las velocidades de los motores
+SemaphoreHandle_t xMutex_MotorSpeeds;
+
+typedef enum {
+  Nada,        // 0
+  Calibracion, // 1
+  Pid,         // 2 
+  Limpiar_R,   // 3
+  Bluetooth    // 4
+} Modulos;
+
+// VARIABLES DE LAS INTERRUPCIONES
+volatile Modulos Botones = Nada;
+
+// Variables para almacenar las velocidades de los motores
+int m1Speed, m2Speed;
+
+// Tareas
+TaskHandle_t xTaskPIDHandle;
+TaskHandle_t xTaskMotoresHandle;
+TaskHandle_t xTaskCheckButtonsHandle;
+
+// Prototipos de funciones
+void InterCalibrar();
+void InterIniciar();
+void InterLimpieza();
+void Calibrar();
+void left(int value);
+void right(int value);
+void PID();
+void Limpieza();
+void TaskPID(void *pvParameters);
+void TaskMotores(void *pvParameters);
+void TaskCheckButtons(void *pvParameters);
+
+void setup() {
+  // Configuración de pines
+  pinMode(LED_DER, OUTPUT);
+  pinMode(LED_IZQ, OUTPUT);
+  pinMode(ML_IN1, OUTPUT);
+  pinMode(ML_IN2, OUTPUT);
+  pinMode(ML_PWM, OUTPUT);
+  pinMode(MR_IN1, OUTPUT);
+  pinMode(MR_IN2, OUTPUT);
+  pinMode(MR_PWM, OUTPUT);
+  pinMode(BOT_I, INPUT_PULLUP);
+  pinMode(BOT_C, INPUT_PULLUP);
+  pinMode(BOT_D, INPUT_PULLUP);
+
+  // Configuración de interrupciones
+  attachInterrupt(digitalPinToInterrupt(PC15), InterCalibrar, FALLING);
+  attachInterrupt(digitalPinToInterrupt(PC14), InterIniciar, FALLING);
+  attachInterrupt(digitalPinToInterrupt(PC13), InterLimpieza, FALLING);
+
+  // Crear el mutex para las velocidades de los motores
+  xMutex_MotorSpeeds = xSemaphoreCreateMutex();
+
+  // Creación de tareas
+  xTaskCreate(TaskPID, "PID", 128, NULL, 2, &xTaskPIDHandle); // Mayor prioridad
+  xTaskCreate(TaskMotores, "Motores", 128, NULL, 2, &xTaskMotoresHandle); 
+  xTaskCreate(TaskCheckButtons, "CheckButtons", 128, NULL, 1, &xTaskCheckButtonsHandle);
+
+  vTaskStartScheduler();
+}
+
+void loop() {
+  // No hacer nada en loop() ya que las tareas son manejadas por FreeRTOS
+}
+
+void TaskPID(void *pvParameters) {
+  while (1) {
+    if (Botones == Pid) {
+      uint16_t position = qtr.readLineWhite(sensorValues);
+      float error = position - 3500;
+
+      integral = integral + error;
+      integral = constrain(integral, -1200, 1200);
+      float motorSpeed = KP * error + KD * (error - lastError) + KI * integral;
+      lastError = error;
+
+      MotorF = map(motorSpeed, -maxMotorSpeed, maxMotorSpeed, -225, 225);
+      MotorF = constrain(MotorF, -225, 225);
+
+      // Actualización de las velocidades de los motores
+      xSemaphoreTake(xMutex_MotorSpeeds, portMAX_DELAY);
+      m1Speed = Velocidad + MotorF;
+      m2Speed = Velocidad - MotorF;
+      xSemaphoreGive(xMutex_MotorSpeeds);
+
+      // Indicadores LED basados en el error
+      if (lastError > 0) {
+          digitalWrite(LED_IZQ, HIGH);
+          digitalWrite(LED_DER, LOW);
+      } else if (lastError < 0) {
+          digitalWrite(LED_IZQ, LOW);
+          digitalWrite(LED_DER, HIGH);
+      }
+    }
+    vTaskDelay(30 / portTICK_PERIOD_MS); // Retraso para evitar bucle demasiado rápido
+  }
+}
+
+void TaskMotores(void *pvParameters) {
+  while (1) {
+    if (Botones == Pid) {
+      // Control de motores usando los valores calculados en TaskPID
+      xSemaphoreTake(xMutex_MotorSpeeds, portMAX_DELAY);
+      right(m1Speed);
+      left(m2Speed);
+      xSemaphoreGive(xMutex_MotorSpeeds);
+    }
+    vTaskDelay(30 / portTICK_PERIOD_MS);
+  }
+}
+
+void TaskCheckButtons(void *pvParameters) {
+  while (1) {
+    if (Botones == Calibracion) {
+      Calibrar();
+      Botones = Nada;
+    } else if (Botones == Limpiar_R) {
+      Limpieza();
+      Botones = Nada;
+    }
+    vTaskDelay(60 / portTICK_PERIOD_MS);
+  }
+}
+
+void InterCalibrar() {
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  Botones = Calibracion;
+  vTaskNotifyGiveFromISR(xTaskCheckButtonsHandle, &xHigherPriorityTaskWoken);
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
+void InterIniciar() {
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  Botones = Pid;
+  vTaskNotifyGiveFromISR(xTaskPIDHandle, &xHigherPriorityTaskWoken);
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
+void InterLimpieza() {
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  Botones = Limpiar_R;
+  vTaskNotifyGiveFromISR(xTaskCheckButtonsHandle, &xHigherPriorityTaskWoken);
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
+void Calibrar() {
+  qtr.setTypeAnalog();
+  qtr.setSensorPins((const uint8_t[]){PB1, PB0, PA7, PA6, PA5, PA4, PA3, PA2}, SensorCount);
+  digitalWrite(LED_DER, HIGH);
+  for (uint16_t i = 0; i < 400; i++) {
+    qtr.calibrate();
+  }
+  digitalWrite(LED_DER, LOW);
+}
+
+void Limpieza() {
+  digitalWrite(ML_IN1, HIGH);
+  digitalWrite(ML_IN2, LOW);
+  analogWrite(ML_PWM, 255);
+  digitalWrite(MR_IN1, HIGH);
+  digitalWrite(MR_IN2, LOW);
+  analogWrite(MR_PWM, 255);
+  delay(500);
+  analogWrite(ML_PWM, 0);
+  analogWrite(MR_PWM, 0);
+  digitalWrite(LED_IZQ, LOW);
+  digitalWrite(LED_DER, LOW);
+  Botones = Nada;
+}
+
+void left(int value) {
+  if (value >= 0) {
+    digitalWrite(ML_IN1, HIGH);
+    digitalWrite(ML_IN2, LOW);
+  } else {
+    digitalWrite(ML_IN1, LOW);
+    digitalWrite(ML_IN2, HIGH);
+    value = -value;
+  }
+  analogWrite(ML_PWM, value);
+}
+
+void right(int value) {
+  if (value >= 0) {
+    digitalWrite(MR_IN1, HIGH);
+    digitalWrite(MR_IN2, LOW);
+  } else {
+    digitalWrite(MR_IN1, LOW);
+    digitalWrite(MR_IN2, HIGH);
+    value = -value;
+  }
+  analogWrite(MR_PWM, value);
+}
