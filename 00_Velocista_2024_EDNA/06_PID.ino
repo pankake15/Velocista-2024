@@ -17,6 +17,7 @@ void PID(){
         MotorF = map(motorSpeed, -maxMotorSpeed, maxMotorSpeed, -255, 255);
         MotorF = constrain(MotorF, -255, 255);
 
+/*
         for (uint8_t i = 0; i < SensorCount; i++){
             Serial1.print(i);
             Serial1.print(": ");
@@ -31,7 +32,7 @@ void PID(){
               MotorF = 0;
             digitalWrite(LED_IZQ, HIGH);
             digitalWrite(LED_DER, HIGH);
-            }
+            }*/
         
         int m1Speed = Velocidad + MotorF;
         int m2Speed = Velocidad - MotorF;

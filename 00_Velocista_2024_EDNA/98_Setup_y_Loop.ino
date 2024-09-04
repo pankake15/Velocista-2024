@@ -1,5 +1,5 @@
 void setup() {
-    Serial1.begin(9600);
+    //Serial1.begin(9600);
 
     // Configuración de pines
     pinMode(LED_DER, OUTPUT);
@@ -32,8 +32,8 @@ void loop() {
           PID();
           }
     } else if (Etapa == Limpiar_R){
-      Limpieza();
+      Limpieza();/*
     }else if(Etapa == Bluetooth){
-      bluetooth();
+      bluetooth();*/
     }
 }
