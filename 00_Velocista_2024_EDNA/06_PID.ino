@@ -1,10 +1,7 @@
 void PID(){
-  int sensores_c = 0;
-  int sensoresSuma = 0;
-        
   // CALCULA POSICION DE LINEA NEGRA SEGUN LECTURA DE SENSORES (0-7000)
         uint16_t position = qtr.readLineWhite(sensorValues);
-        qtr.read(Valores_rampa);
+        // qtr.read(Valores_rampa);
         
         // CALCULO PID
         float error = position - 3500;

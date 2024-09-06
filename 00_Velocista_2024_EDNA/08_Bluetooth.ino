@@ -1,4 +1,4 @@
-/*
+
 void bluetooth() {
     right(0);
     left(0);
@@ -50,6 +50,7 @@ void bluetooth() {
                 break;
             default:
              Serial1.println("Caracter Desconocido ");
+             Serial1.flush();  // Esto vacía el buffer de salida de Serial1
              Botones = Pid;
         }
            Serial1.print("KP:");
@@ -63,4 +64,3 @@ void bluetooth() {
 
     }
 }
-*/

@@ -1,5 +1,5 @@
 void setup() {
-    //Serial1.begin(9600);
+    Serial1.begin(9600);
 
     // Configuración de pines
     pinMode(LED_DER, OUTPUT);
@@ -25,15 +25,16 @@ void loop() {
     if (Etapa == Calibracion) {
         Calibrar();
     } else if (Etapa == Pid) {
-        if (Serial1.available() > 1 && Serial1.read()!= 13 && Serial1.read()!= 10){
+        if (Serial1.available() >= 1 && Serial1.read()!= 13 && Serial1.read()!= 10){
+          Serial1.println("Esperando datos de Bluetooth...");
           Botones = Bluetooth;
           }
         else { 
           PID();
           }
     } else if (Etapa == Limpiar_R){
-      Limpieza();/*
+      Limpieza();
     }else if(Etapa == Bluetooth){
-      bluetooth();*/
+      bluetooth();
     }
 }
