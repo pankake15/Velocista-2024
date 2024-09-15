@@ -3,6 +3,8 @@ void PID(){
         uint16_t position = qtr.readLineWhite(sensorValues);
         // qtr.read(Valores_rampa);
         
+        
+
         // CALCULO PID
         float error = position - 3500;
         integral = integral + error;
@@ -10,6 +12,8 @@ void PID(){
         float motorSpeed = KP * error + KD * (error - lastError) + KI * integral;
         lastError = error;
         
+
+
         // Mapeo de motorSpeed a rango de -255 a 255
         MotorF = map(motorSpeed, -maxMotorSpeed, maxMotorSpeed, -255, 255);
         MotorF = constrain(MotorF, -255, 255);
@@ -17,7 +21,7 @@ void PID(){
 /*
         for (uint8_t i = 0; i < SensorCount; i++){
             Serial1.print(i);
-            Serial1.print(": ");
+            Serial1.print(": ");  
             Serial1.print(Valores_rampa[i]);
             Serial1.print("    ");
             sensoresSuma += Valores_rampa[i];
